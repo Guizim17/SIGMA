@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGMA — Consulta de Medicamentos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  
+  
+  <script>
+    if (localStorage.getItem("tema") === "dark") {
+      document.documentElement.classList.add("dark-loading");
+    }
+  </script>
+
+  <style>
+    /* ────── CORES DA PAGINA ────── */
+    /* TEMA CLARO */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff; --surface: #f0f0f0;
+      --border: rgba(0,0,0,0.10); --border-strong: rgba(0,0,0,0.20);
+      --text: #1a1a18; --muted: #383836; --hint: #83837f;
+      --teal-50: #E1F5EE; --teal-200: #5DCAA5; --teal-400: #1D9E75; --teal-600: #0F6E56;
+      --amber-50: #FAEEDA; --amber-600: #854F0B;
+      --radius-md: 8px; --radius-lg: 12px;
+    }
+
+    /* COR DEFINIDA PELO SISTEMA
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a; --surface: #242422;
+        --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.20);
+        --text: #f0efe8; --muted: #9a9a96; --hint: #5e5e5a;
+        --teal-50: #04342C; --teal-200: #1D9E75; --teal-600: #5DCAA5;
+        --amber-50: #412402; --amber-600: #FAC775;
+      }
+    }
+    */
+    
+    /* TEMA ESCURO */
+    body.dark {
+      --bg: #1c1c1a;
+      --surface: #242422;
+      --border: rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.20);
+      --text: #f0efe8;
+      --muted: #9a9a96;
+      --hint: #5e5e5a;
+      --teal-50: #04342C;
+      --teal-200: #1D9E75;
+      --teal-600: #5DCAA5;
+      --amber-50: #412402;
+      --amber-600: #FAC775;
+    }
+
+    
+
+    body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; }
+    .page { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+    .brand { display: flex; align-items: baseline; gap: 10px; margin-bottom: 2.5rem; }
+    .brand-name { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); letter-spacing: -0.5px; }
+    .brand-tag { font-size: 12px; color: var(--hint); letter-spacing: 0.06em; text-transform: uppercase; }
+    .search-label { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 0.5px solid var(--border-strong);
+      color: var(--muted);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .back-btn:hover {
+      border-color: var(--teal-200);
+      color: var(--teal-600);
+    }
+    .search-row {
+      display: flex; align-items: center;
+      border: 1px solid var(--border-strong); border-radius: var(--radius-lg);
+      background: var(--bg); overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-row:focus-within { border-color: var(--teal-200); box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
+    .search-icon { padding: 0 12px 0 16px; color: var(--hint); font-size: 18px; }
+    .search-input {
+      flex: 1; border: none; outline: none; background: transparent;
+      font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); padding: 14px 0;
+    }
+    .search-input::placeholder { color: var(--hint); font-weight: 300; }
+    .search-btn {
+      display: flex; align-items: center; gap: 6px;
+      border: none; border-left: 1px solid var(--border);
+      background: var(--teal-400); color: #fff;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      padding: 0 20px; height: 50px; cursor: pointer;
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0; transition: background 0.15s;
+    }
+    .search-btn:hover  { background: var(--teal-600); }
+    .search-btn:active { transform: scale(0.98); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .chip {
+      background: var(--bg); border: 0.5px solid var(--border); border-radius: 999px;
+      padding: 5px 14px; font-size: 12px; color: var(--muted); cursor: pointer; transition: all 0.12s;
+    }
+    .chip:hover { background: var(--teal-50); color: var(--teal-600); border-color: var(--teal-200); }
+    .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+    .filters-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .filter-label { font-size: 12px; color: var(--hint); text-transform: uppercase; letter-spacing: 0.06em; }
+    .filter-pill {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--bg); border: 0.5px solid var(--border); border-radius: 999px;
+      padding: 6px 14px; font-size: 12px; color: var(--muted); cursor: pointer; transition: all 0.12s; user-select: none;
+    }
+    .filter-pill:hover { background: var(--surface); border-color: var(--border-strong); }
+    .filter-pill.active { background: var(--teal-50); color: var(--teal-600); border-color: var(--teal-200); }
+    .results-area { margin-top: 1.5rem; display: none; }
+    .results-title { font-size: 12px; color: var(--hint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .result-card {
+      background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg);
+      padding: 14px 16px; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 14px; cursor: pointer;
+      transition: border-color 0.12s, box-shadow 0.12s;
+    }
+    .result-card:hover { border-color: var(--teal-200); box-shadow: 0 0 0 3px rgba(29,158,117,0.06); }
+    .result-icon {
+      width: 40px; height: 40px; border-radius: var(--radius-md);
+      background: var(--teal-50); display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 18px; color: var(--teal-600);
+    }
+    .result-info { flex: 1; }
+    .result-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+    .result-sub  { font-size: 12px; color: var(--muted); }
+    .result-badge {
+      font-size: 11px; padding: 3px 10px; border-radius: 999px;
+      background: var(--teal-50); color: var(--teal-600); font-weight: 500; white-space: nowrap;
+    }
+    .result-empty {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg);
+      padding: 20px; font-size: 13px; color: var(--muted);
+    }
+    .skeleton { background: var(--surface); border-radius: var(--radius-lg); height: 68px; margin-bottom: 8px; animation: pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 100;
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg); border-radius: var(--radius-lg); border: 0.5px solid var(--border);
+      width: 100%; max-width: 560px; max-height: 80vh; overflow-y: auto; padding: 1.5rem;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
+    .modal-title { font-size: 18px; font-weight: 500; color: var(--text); }
+    .modal-sub   { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .modal-close {
+      background: none; border: none; cursor: pointer; color: var(--muted);
+      font-size: 20px; padding: 4px; border-radius: var(--radius-md); transition: background 0.12s;
+    }
+    .modal-close:hover { background: var(--surface); }
+    .modal-section { margin-bottom: 1.25rem; }
+    .modal-section-title {
+      font-size: 11px; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--hint); margin-bottom: 6px;
+    }
+    .modal-section-body { font-size: 14px; color: var(--text); line-height: 1.6; }
+    .modal-divider { height: 1px; background: var(--border); margin: 1rem 0; }
+    .modal-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--amber-50); color: var(--amber-600);
+      border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 500;
+    }
+    .modal-pdf-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--teal-400); color: #fff; border: none; border-radius: var(--radius-md);
+      padding: 10px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: pointer; text-decoration: none; margin-top: 0.5rem; transition: background 0.15s;
+    }
+    .modal-pdf-btn:hover { background: var(--teal-600); }
+    .theme-btn {
+      margin-left: auto;  /* empurra o botão para a direita */
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .theme-btn:hover {
+      border-color: var(--teal-200);
+      color: var(--teal-600);
+    }
+    html.dark-loading {
+    background: #1c1c1a;
+    }
+   
+  </style>
+</head>
+<body>
+<main class="page">
+  <div class="brand">
+      <a href="index.html" class="back-btn" aria-label="Voltar ao início">
+    <i class="ti ti-arrow-left" aria-hidden="true"></i>
+  </a>
+    <span class="brand-name">SIGMA</span>
+    <span class="brand-tag">Consulta de medicamentos</span>
+    <button id="themeBtn" class="theme-btn" onclick="alternarTema()">
+      <i class="ti ti-moon" aria-hidden="true"></i> Escuro
+    </button>
+  </div>
+
+  <p class="search-label">Nome do medicamento, categoria ou via de administração</p>
+  <div class="search-row">
+    <span class="search-icon" aria-hidden="true"><i class="ti ti-pill"></i></span>
+    <input class="search-input" id="searchInput" type="text"
+      placeholder="Ex: Dipirona, Antibiótico, Oral…"
+      autocomplete="off" aria-label="Buscar medicamento" />
+    <button class="search-btn" onclick="doSearch()">
+      <i class="ti ti-search" aria-hidden="true"></i> Buscar
+    </button>
+  </div>
+
+  <div class="chips" role="list" aria-label="Buscas rápidas">
+    <span class="chip" role="listitem" onclick="fillSearch('Dipirona')">Dipirona</span>
+    <span class="chip" role="listitem" onclick="fillSearch('Ibuprofeno')">Ibuprofeno</span>
+    <span class="chip" role="listitem" onclick="fillSearch('Amoxicilina')">Amoxicilina</span>
+    <span class="chip" role="listitem" onclick="fillSearch('Losartana')">Losartana</span>
+    <span class="chip" role="listitem" onclick="fillSearch('Omeprazol')">Omeprazol</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="filters-row" role="group" aria-label="Filtros por via de administração">
+    <span class="filter-label">Via</span>
+    <div class="filter-pill active" onclick="toggleFilter(this)" data-via="">
+      <i class="ti ti-list" style="font-size:14px;" aria-hidden="true"></i> Todas
+    </div>
+    <div class="filter-pill" onclick="toggleFilter(this)" data-via="Oral">
+      <i class="ti ti-mouth" style="font-size:14px;" aria-hidden="true"></i> Oral
+    </div>
+    <div class="filter-pill" onclick="toggleFilter(this)" data-via="Injetável">
+      <i class="ti ti-needle" style="font-size:14px;" aria-hidden="true"></i> Injetável
+    </div>
+    <div class="filter-pill" onclick="toggleFilter(this)" data-via="Tópica">
+      <i class="ti ti-hand-stop" style="font-size:14px;" aria-hidden="true"></i> Tópica
+    </div>
+  </div>
+
+  <div class="results-area" id="resultsArea">
+    <p class="results-title" id="resultsTitle"></p>
+    <div id="resultsList"></div>
+  </div>
+</main>
+
+<!-- Modal de detalhe -->
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
+  <div class="modal" id="modalContent">
+    <div class="modal-header">
+      <div>
+        <p class="modal-title" id="modalNome"></p>
+        <p class="modal-sub"   id="modalCategoria"></p>
+      </div>
+      <button class="modal-close" onclick="fecharModal()" aria-label="Fechar">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="modal-section">
+      <p class="modal-section-title">Via de administração</p>
+      <div id="modalVia"></div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-section">
+      <p class="modal-section-title">Resumo</p>
+      <p class="modal-section-body" id="modalResumo"></p>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-section">
+      <p class="modal-section-title">Efeitos colaterais</p>
+      <p class="modal-section-body" id="modalEfeitos"></p>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-section">
+      <p class="modal-section-title">Interações medicamentosas</p>
+      <p class="modal-section-body" id="modalInteracoes"></p>
+    </div>
+    <div id="modalPdfWrap" style="display:none; margin-top:0.5rem;">
+      <div class="modal-divider"></div>
+      <a class="modal-pdf-btn" id="modalPdfLink" href="#" target="_blank" rel="noopener">
+        <i class="ti ti-file-text" aria-hidden="true"></i>
+        Ver bula completa (PDF)
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── CONFIGURAÇÃO ─────────────────────────────
+  // API EM PRODUÇÃO
+  const API_BASE = "http://localhost:5000";
+
+  let filtroVia = "";
+
+  // ── BUSCA ────────────────────────────────────
+  function fillSearch(termo) {
+    document.getElementById("searchInput").value = termo;
+    doSearch();
+  }
+
+  async function doSearch() {
+    const query = document.getElementById("searchInput").value.trim();
+    const area  = document.getElementById("resultsArea");
+    const lista = document.getElementById("resultsList");
+    const title = document.getElementById("resultsTitle");
+
+    if (!query) { area.style.display = "none"; return; }
+
+    area.style.display = "block";
+    title.textContent  = "Buscando…";
+    lista.innerHTML    = [1,2,3].map(() => `<div class="skeleton"></div>`).join("");
+
+    try {
+      const res  = await fetch(`${API_BASE}/buscar?q=${encodeURIComponent(query)}`);
+      let dados  = await res.json();
+
+      if (filtroVia) {
+        dados = dados.filter(m =>
+          (m.via_administracao || "").toLowerCase().includes(filtroVia.toLowerCase())
+        );
+      }
+
+      if (!Array.isArray(dados) || dados.length === 0) {
+        title.textContent = `Nenhum resultado para "${query}"`;
+        lista.innerHTML = `
+          <div class="result-empty">
+            <i class="ti ti-mood-empty" style="font-size:20px;" aria-hidden="true"></i>
+            Tente outro nome ou categoria
+          </div>`;
+        return;
+      }
+
+      const plural = dados.length !== 1;
+      title.textContent = `${dados.length} resultado${plural?"s":""} encontrado${plural?"s":""}`;
+
+      lista.innerHTML = dados.map(m => `
+        <div class="result-card" role="button" tabindex="0"
+          onclick="abrirDetalhe(${m.id})"
+          onkeydown="if(event.key==='Enter') abrirDetalhe(${m.id})">
+          <div class="result-icon" aria-hidden="true"><i class="ti ti-pill"></i></div>
+          <div class="result-info">
+            <p class="result-name">${m.nome_medicamento}</p>
+            <p class="result-sub">${m.categoria || "—"}</p>
+          </div>
+          <span class="result-badge">${m.via_administracao || "—"}</span>
+        </div>
+      `).join("");
+
+    } catch (err) {
+      title.textContent = "Erro ao conectar com a API";
+      lista.innerHTML = `
+        <div class="result-empty">
+          <i class="ti ti-wifi-off" style="font-size:20px;" aria-hidden="true"></i>
+          Verifique se o servidor está rodando em ${API_BASE}
+        </div>`;
+      console.error(err);
+    }
+  }
+
+  // ── DETALHE ──────────────────────────────────
+  async function abrirDetalhe(id) {
+    document.getElementById("modalOverlay").classList.add("open");
+    document.getElementById("modalNome").textContent       = "Carregando…";
+    document.getElementById("modalCategoria").textContent  = "";
+    document.getElementById("modalVia").innerHTML          = "";
+    document.getElementById("modalResumo").textContent     = "";
+    document.getElementById("modalEfeitos").textContent    = "";
+    document.getElementById("modalInteracoes").textContent = "";
+    document.getElementById("modalPdfWrap").style.display  = "none";
+
+    try {
+      const res = await fetch(`${API_BASE}/medicamento/${id}`);
+      const m   = await res.json();
+
+      document.getElementById("modalNome").textContent       = m.nome_medicamento;
+      document.getElementById("modalCategoria").textContent  = m.categoria || "—";
+      document.getElementById("modalResumo").textContent     = m.resumo || "Informação não disponível.";
+      document.getElementById("modalEfeitos").textContent    = m.efeitos_colaterais || "Informação não disponível.";
+      document.getElementById("modalInteracoes").textContent = m.interacoes_medicamentosas || "Informação não disponível.";
+
+      document.getElementById("modalVia").innerHTML =
+        `<span class="modal-pill">
+           <i class="ti ti-activity" aria-hidden="true"></i>
+           ${m.via_administracao || "Não informada"}
+         </span>`;
+
+      if (m.link_pdf) {
+        document.getElementById("modalPdfLink").href          = m.link_pdf;
+        document.getElementById("modalPdfWrap").style.display = "block";
+      }
+    } catch (err) {
+      document.getElementById("modalNome").textContent = "Erro ao carregar dados.";
+      console.error(err);
+    }
+  }
+
+  function fecharModal(event) {
+    if (event && event.target !== document.getElementById("modalOverlay")) return;
+    document.getElementById("modalOverlay").classList.remove("open");
+  }
+
+  // ── FILTROS ──────────────────────────────────
+  function toggleFilter(el) {
+    document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+    el.classList.add("active");
+    filtroVia = el.dataset.via;
+    if (document.getElementById("searchInput").value.trim()) doSearch();
+  }
+
+  // ── TECLADO ──────────────────────────────────
+  document.getElementById("searchInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") doSearch();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") document.getElementById("modalOverlay").classList.remove("open");
+  });
+  
+  function alternarTema() {
+  const btn = document.getElementById("themeBtn");
+  document.body.classList.toggle("dark");
+  const estaEscuro = document.body.classList.contains("dark");
+  localStorage.setItem("tema", estaEscuro ? "dark" : "light");
+  btn.innerHTML = estaEscuro
+    ? `<i class="ti ti-sun" aria-hidden="true"></i> Claro`
+    : `<i class="ti ti-moon" aria-hidden="true"></i> Escuro`;
+}
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("themeBtn");
+    if (localStorage.getItem("tema") === "dark") {
+      document.body.classList.add("dark");
+      btn.innerHTML = `<i class="ti ti-sun" aria-hidden="true"></i> Claro`;
+    }
+    document.documentElement.classList.remove("dark-loading");
+  });
+</script>
+</body>
+</html>

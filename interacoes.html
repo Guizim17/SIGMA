@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGMA — Verificar Interação</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+  <script>
+    if (localStorage.getItem("tema") === "dark") {
+      document.documentElement.classList.add("dark-loading");
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:             #ffffff;
+      --surface:        #f6f5f0;
+      --border:         rgba(0,0,0,0.10);
+      --border-strong:  rgba(0,0,0,0.20);
+      --text:           #1a1a18;
+      --muted:          #6b6b68;
+      --hint:           #a0a09c;
+      --teal-50:  #E1F5EE;
+      --teal-200: #5DCAA5;
+      --teal-600: #0F6E56;
+      --coral-50:  #FAECE7;
+      --coral-200: #F0997B;
+      --coral-600: #993C1D;
+      --amber-50:  #FAEEDA;
+      --amber-600: #854F0B;
+      --red-50:   #FCEBEB;
+      --red-600:  #A32D2D;
+      --green-50: #EAF3DE;
+      --green-600:#3B6D11;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    html.dark-loading {
+      background: #1c1c1a;
+    }
+
+    /*  COR DEFINIDA PE SISTEMA
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:            #1c1c1a;
+        --surface:       #242422;
+        --border:        rgba(255,255,255,0.10);
+        --border-strong: rgba(255,255,255,0.20);
+        --text:          #f0efe8;
+        --muted:         #9a9a96;
+        --hint:          #5e5e5a;
+        --teal-50:  #04342C;
+        --teal-200: #1D9E75;
+        --teal-600: #5DCAA5;
+        --coral-50:  #412105;
+        --coral-200: #D85A30;
+        --coral-600: #F0997B;
+        --amber-50:  #412402;
+        --amber-600: #FAC775;
+        --red-50:   #501313;
+        --red-600:  #F09595;
+        --green-50: #173404;
+        --green-600:#97C459;
+      }
+    }
+*/
+
+    body.dark {
+      --bg:            #1c1c1a;
+      --surface:       #242422;
+      --border:        rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.20);
+      --text:          #f0efe8;
+      --muted:         #9a9a96;
+      --hint:          #5e5e5a;
+      --teal-50:  #04342C;
+      --teal-200: #1D9E75;
+      --teal-600: #5DCAA5;
+      --coral-50:  #412105;
+      --coral-200: #D85A30;
+      --coral-600: #F0997B;
+      --amber-50:  #412402;
+      --amber-600: #FAC775;
+      --red-50:   #501313;
+      --red-600:  #F09595;
+      --green-50: #173404;
+      --green-600:#97C459;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    /* ── Brand / topo ── */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2.5rem;
+    }
+    .brand-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 30px;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    .brand-tag {
+      font-size: 12px;
+      color: var(--hint);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .back-btn, .theme-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 0.5px solid var(--border-strong);
+      color: var(--muted);
+      text-decoration: none;
+      background: var(--bg);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .theme-btn {
+      margin-left: auto;
+      width: auto;
+      padding: 0 14px;
+      gap: 6px;
+    }
+    .back-btn:hover, .theme-btn:hover {
+      border-color: var(--teal-200);
+      color: var(--teal-600);
+    }
+
+    /* ── Título da página ── */
+    .page-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    .page-sub {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Seletor duplo ── */
+    .interacao-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .coluna-med {
+      flex: 1;
+      min-width: 0;
+    }
+    .autocomplete-wrap {
+      position: relative;
+    }
+    .search-row {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      background: var(--bg);
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-row:focus-within {
+      border-color: var(--teal-200);
+      box-shadow: 0 0 0 3px rgba(29,158,117,0.12);
+    }
+    .search-icon { padding: 0 0 0 14px; color: var(--hint); font-size: 16px; }
+    .search-input {
+      flex: 1;
+      border: none; outline: none; background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; color: var(--text);
+      padding: 13px 12px;
+      width: 100%;
+    }
+    .search-input::placeholder { color: var(--hint); font-weight: 300; }
+
+    .interacao-plus {
+      color: var(--hint);
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 14px;
+    }
+
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 10;
+      display: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .suggestion-item {
+      padding: 10px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-item:hover { background: var(--surface); }
+    .suggestion-empty {
+      padding: 12px 14px;
+      font-size: 12px;
+      color: var(--hint);
+    }
+
+    .verificar-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 560px;
+      margin: 1.25rem auto 0;
+      border: none;
+      background: var(--teal-200);
+      color: #053f30;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 13px;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .verificar-btn:hover { opacity: 0.88; }
+    .verificar-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ── Resultado da verificação ── */
+    .resultado-card {
+      max-width: 560px;
+      margin: 1.5rem auto 0;
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      display: none;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .resultado-card.show { display: flex; }
+    .resultado-card.grave    { background: var(--red-50); }
+    .resultado-card.moderada { background: var(--amber-50); }
+    .resultado-card.leve     { background: var(--green-50); }
+    .resultado-card.neutro   { background: var(--surface); border: 0.5px solid var(--border); }
+
+    .resultado-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+    .resultado-card.grave    .resultado-icon { color: var(--red-600); }
+    .resultado-card.moderada .resultado-icon { color: var(--amber-600); }
+    .resultado-card.leve     .resultado-icon { color: var(--green-600); }
+    .resultado-card.neutro   .resultado-icon { color: var(--muted); }
+
+    .resultado-titulo { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .resultado-card.grave    .resultado-titulo { color: var(--red-600); }
+    .resultado-card.moderada .resultado-titulo { color: var(--amber-600); }
+    .resultado-card.leve     .resultado-titulo { color: var(--green-600); }
+    .resultado-card.neutro   .resultado-titulo { color: var(--text); }
+    .resultado-texto { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--border); margin: 2.5rem 0 1.5rem; }
+
+    /* ── Lista de medicamentos por coluna ── */
+    .lista-label {
+      font-size: 11px;
+      color: var(--hint);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 14px 0 8px;
+    }
+    .lista-medicamentos {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .med-item {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+    }
+    .med-item:hover {
+      border-color: var(--teal-200);
+      background: var(--teal-50);
+    }
+    .med-item.selecionado {
+      border-color: var(--teal-200);
+      background: var(--teal-50);
+    }
+    .med-item.hidden {
+      display: none;
+    }
+    .med-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-md);
+      background: var(--teal-50);
+      color: var(--teal-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .med-info { flex: 1; min-width: 0; }
+    .med-nome {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .med-categoria {
+      font-size: 11px;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .lista-empty {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+
+    <div class="brand">
+      <a href="index.html" class="back-btn" aria-label="Voltar ao início">
+        <i class="ti ti-arrow-left" aria-hidden="true"></i>
+      </a>
+      <span class="brand-name">SIGMA</span>
+      <span class="brand-tag">INTERAÇÕES MEDICAMENTOSAS</span>
+      <button id="themeBtn" class="theme-btn" onclick="alternarTema()">
+        <i class="ti ti-moon" aria-hidden="true"></i> Escuro
+      </button>
+    </div>
+
+    <p class="page-title">Verificar interação entre medicamentos</p>
+    <p class="page-sub">Selecione dois medicamentos para checar se há interação conhecida</p>
+
+    <div class="interacao-row">
+
+      <div class="coluna-med">
+        <div class="autocomplete-wrap">
+          <div class="search-row">
+            <span class="search-icon" aria-hidden="true"><i class="ti ti-pill"></i></span>
+            <input
+              class="search-input"
+              id="medA_input"
+              type="text"
+              placeholder="Medicamento A"
+              autocomplete="off"
+              oninput="buscarSugestoes('A')"
+            />
+          </div>
+          <input type="hidden" id="medA_id" />
+          <div class="suggestions" id="medA_suggestions"></div>
+        </div>
+
+        <p class="lista-label">Selecionar da lista</p>
+        <div class="lista-medicamentos" id="listaA">
+          <div class="lista-empty">Carregando…</div>
+        </div>
+      </div>
+
+      <span class="interacao-plus" aria-hidden="true"><i class="ti ti-plus"></i></span>
+
+      <div class="coluna-med">
+        <div class="autocomplete-wrap">
+          <div class="search-row">
+            <span class="search-icon" aria-hidden="true"><i class="ti ti-pill"></i></span>
+            <input
+              class="search-input"
+              id="medB_input"
+              type="text"
+              placeholder="Medicamento B"
+              autocomplete="off"
+              oninput="buscarSugestoes('B')"
+            />
+          </div>
+          <input type="hidden" id="medB_id" />
+          <div class="suggestions" id="medB_suggestions"></div>
+        </div>
+
+        <p class="lista-label">Selecionar da lista</p>
+        <div class="lista-medicamentos" id="listaB">
+          <div class="lista-empty">Carregando…</div>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="verificar-btn" onclick="verificarInteracao()">
+      <i class="ti ti-shield-check" aria-hidden="true"></i>
+      Verificar interação
+    </button>
+
+    <div class="resultado-card" id="resultadoCard">
+      <span class="resultado-icon" id="resultadoIcon" aria-hidden="true"></span>
+      <div>
+        <p class="resultado-titulo" id="resultadoTitulo"></p>
+        <p class="resultado-texto" id="resultadoTexto"></p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const API_BASE = "http://localhost:5000";
+
+    let todosMedicamentos = [];
+
+    /* ── Carrega a lista completa uma vez e distribui para as duas colunas ── */
+    async function carregarTodosMedicamentos() {
+      try {
+        const res = await fetch(`${API_BASE}/buscar?q=`);
+        let dados = await res.json();
+
+        if (!Array.isArray(dados) || dados.length === 0) {
+          dados = await buscarTodosFallback();
+        }
+
+        todosMedicamentos = dados;
+        renderizarLista("A", dados);
+        renderizarLista("B", dados);
+      } catch (err) {
+        renderizarErro("A");
+        renderizarErro("B");
+        console.error(err);
+      }
+    }
+
+    async function buscarTodosFallback() {
+      const letras = "aeiou".split("");
+      const encontrados = new Map();
+      for (const letra of letras) {
+        try {
+          const res = await fetch(`${API_BASE}/buscar?q=${letra}`);
+          const dados = await res.json();
+          if (Array.isArray(dados)) dados.forEach(m => encontrados.set(m.id, m));
+        } catch (e) {}
+      }
+      return Array.from(encontrados.values());
+    }
+
+    function renderizarErro(qual) {
+      document.getElementById(`lista${qual}`).innerHTML =
+        `<div class="lista-empty">Não foi possível carregar. Verifique a API.</div>`;
+    }
+
+    function renderizarLista(qual, dados) {
+      const lista = document.getElementById(`lista${qual}`);
+      if (dados.length === 0) {
+        lista.innerHTML = `<div class="lista-empty">Nenhum medicamento cadastrado ainda.</div>`;
+        return;
+      }
+      const idSelecionado = document.getElementById(`med${qual}_id`).value;
+      lista.innerHTML = dados.map(m => `
+        <div class="med-item ${String(m.id) === idSelecionado ? "selecionado" : ""}"
+             data-nome="${m.nome_medicamento.toLowerCase()}"
+             data-id="${m.id}"
+             onclick="selecionarMedicamento('${qual}', ${m.id}, '${m.nome_medicamento.replace(/'/g, "\\'")}')">
+          <div class="med-icon" aria-hidden="true"><i class="ti ti-pill"></i></div>
+          <div class="med-info">
+            <p class="med-nome">${m.nome_medicamento}</p>
+            <p class="med-categoria">${m.categoria || "—"}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    /* ── Filtra apenas a lista da coluna correspondente ── */
+    function filtrarLista(qual) {
+      const termo = document.getElementById(`med${qual}_input`).value.trim().toLowerCase();
+      const lista = document.getElementById(`lista${qual}`);
+
+      lista.querySelectorAll(".med-item").forEach(item => {
+        const nome = item.dataset.nome;
+        const combina = !termo || nome.includes(termo);
+        item.classList.toggle("hidden", !combina);
+      });
+    }
+
+    /* ── Autocomplete dos dois campos ── */
+    async function buscarSugestoes(qual) {
+      const input = document.getElementById(`med${qual}_input`);
+      const box   = document.getElementById(`med${qual}_suggestions`);
+      const query = input.value.trim();
+
+      document.getElementById(`med${qual}_id`).value = "";
+      filtrarLista(qual);
+      ocultarResultado();
+      destacarSelecao(qual, null);
+
+      if (query.length < 1) { box.style.display = "none"; return; }
+
+      try {
+        const res = await fetch(`${API_BASE}/buscar?q=${encodeURIComponent(query)}`);
+        const dados = await res.json();
+
+        if (!Array.isArray(dados) || dados.length === 0) {
+          box.innerHTML = `<div class="suggestion-empty">Nenhum medicamento encontrado</div>`;
+          box.style.display = "block";
+          return;
+        }
+
+        box.innerHTML = dados.map(m => `
+          <div class="suggestion-item" onclick="selecionarMedicamento('${qual}', ${m.id}, '${m.nome_medicamento.replace(/'/g, "\\'")}')">
+            ${m.nome_medicamento}
+          </div>
+        `).join("");
+        box.style.display = "block";
+      } catch (err) {
+        box.style.display = "none";
+        console.error(err);
+      }
+    }
+
+    function selecionarMedicamento(qual, id, nome) {
+      document.getElementById(`med${qual}_input`).value = nome;
+      document.getElementById(`med${qual}_id`).value = id;
+      document.getElementById(`med${qual}_suggestions`).style.display = "none";
+      filtrarLista(qual);
+      destacarSelecao(qual, id);
+      ocultarResultado();
+    }
+
+    /* ── Marca visualmente o item escolhido na lista ── */
+    function destacarSelecao(qual, id) {
+      const lista = document.getElementById(`lista${qual}`);
+      lista.querySelectorAll(".med-item").forEach(item => {
+        item.classList.toggle("selecionado", id !== null && item.dataset.id === String(id));
+      });
+    }
+
+    /* Fecha as sugestões ao clicar fora */
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".autocomplete-wrap")) {
+        document.getElementById("medA_suggestions").style.display = "none";
+        document.getElementById("medB_suggestions").style.display = "none";
+      }
+    });
+
+    /* ── Verificação de interação ── */
+    /* Esta função depende da rota /interacao no api.js e da tabela
+       interacoes_conhecidas, que ainda serão criadas. Por enquanto
+       mostra um aviso amigável caso a rota não exista. */
+    async function verificarInteracao() {
+      const idA = document.getElementById("medA_id").value;
+      const idB = document.getElementById("medB_id").value;
+      const nomeA = document.getElementById("medA_input").value;
+      const nomeB = document.getElementById("medB_input").value;
+
+      if (!idA || !idB) {
+        mostrarResultado("neutro", "ti-info-circle", "Selecione os dois medicamentos",
+          "Escolha um item da lista de sugestões para cada campo antes de verificar.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/interacao?a=${idA}&b=${idB}`);
+
+        if (res.status === 404) {
+          mostrarResultado("neutro", "ti-tools", "Funcionalidade em construção",
+            "A rota de verificação de interação ainda não foi criada na API. Isso será feito quando a tabela de interações estiver pronta.");
+          return;
+        }
+
+        const dados = await res.json();
+
+        if (dados.encontrada) {
+          const gravidade = (dados.gravidade || "moderada").toLowerCase();
+          const icone = gravidade === "grave" ? "ti-alert-triangle" : gravidade === "leve" ? "ti-info-circle" : "ti-alert-circle";
+          mostrarResultado(gravidade, icone,
+            `Interação ${dados.gravidade || "conhecida"} encontrada`,
+            dados.descricao || `${nomeA} e ${nomeB} possuem interação registrada no banco de dados.`);
+        } else {
+          mostrarResultado("neutro", "ti-circle-check",
+            "Nenhuma interação catalogada",
+            `Não há registro de interação entre ${nomeA} e ${nomeB} no nosso banco. Isso não garante que sejam seguros juntos — consulte um profissional de saúde.`);
+        }
+      } catch (err) {
+        mostrarResultado("neutro", "ti-wifi-off", "Erro ao conectar com a API",
+          `Verifique se o servidor está rodando em ${API_BASE}`);
+        console.error(err);
+      }
+    }
+
+    function mostrarResultado(tipo, icone, titulo, texto) {
+      const card = document.getElementById("resultadoCard");
+      card.className = `resultado-card show ${tipo}`;
+      document.getElementById("resultadoIcon").innerHTML = `<i class="ti ${icone}"></i>`;
+      document.getElementById("resultadoTitulo").textContent = titulo;
+      document.getElementById("resultadoTexto").textContent = texto;
+    }
+
+    function ocultarResultado() {
+      document.getElementById("resultadoCard").classList.remove("show");
+    }
+
+    /* ── Tema ── */
+    function alternarTema() {
+        const btn = document.getElementById("themeBtn");
+        document.body.classList.toggle("dark");
+        const estaEscuro = document.body.classList.contains("dark");
+        localStorage.setItem("tema", estaEscuro ? "dark" : "light");
+        btn.innerHTML = estaEscuro
+            ? `<i class="ti ti-sun" aria-hidden="true"></i> Claro`
+            : `<i class="ti ti-moon" aria-hidden="true"></i> Escuro`;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("themeBtn");
+      if (localStorage.getItem("tema") === "dark") {
+        document.body.classList.add("dark");
+        btn.innerHTML = `<i class="ti ti-sun" aria-hidden="true"></i> Claro`;
+      }
+      document.documentElement.classList.remove("dark-loading");
+      carregarTodosMedicamentos();
+    });
+  </script>
+</body>
+</html>

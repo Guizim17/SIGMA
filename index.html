@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGMA — Início</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+  <script>
+    if (localStorage.getItem("tema") === "dark") {
+      document.documentElement.classList.add("dark-loading");
+    }
+
+
+    function alternarTema() {
+      const btn = document.getElementById("themeBtn");
+      document.body.classList.toggle("dark");
+      const estaEscuro = document.body.classList.contains("dark");
+      localStorage.setItem("tema", estaEscuro ? "dark" : "light");
+      btn.innerHTML = estaEscuro
+        ? `<i class="ti ti-sun" aria-hidden="true"></i> Claro`
+        : `<i class="ti ti-moon" aria-hidden="true"></i> Escuro`;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("themeBtn");
+      if (localStorage.getItem("tema") === "dark") {
+        document.body.classList.add("dark");
+        btn.innerHTML = `<i class="ti ti-sun" aria-hidden="true"></i> Claro`;
+      }
+      document.documentElement.classList.remove("dark-loading");
+    });
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:             #ffffff;
+      --surface:        #f6f5f0;
+      --border:         rgba(0,0,0,0.10);
+      --border-strong:  rgba(0,0,0,0.20);
+      --text:           #1a1a18;
+      --muted:          #6b6b68;
+      --hint:           #a0a09c;
+      --teal-50:  #E1F5EE;
+      --teal-200: #5DCAA5;
+      --teal-600: #0F6E56;
+      --coral-50:  #FAECE7;
+      --coral-600: #993C1D;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    body.dark {
+      --bg:            #1c1c1a;
+      --surface:       #242422;
+      --border:        rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.20);
+      --text:          #f0efe8;
+      --muted:         #9a9a96;
+      --hint:          #5e5e5a;
+      --teal-50:  #04342C;
+      --teal-200: #1D9E75;
+      --teal-600: #5DCAA5;
+      --coral-50:  #412105;
+      --coral-600: #F0997B;
+    }
+
+    html.dark-loading { background: #1c1c1a; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 4rem;
+    }
+
+    /* ── Brand ── */
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 3rem;
+    }
+    .brand-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 30px;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    .brand-tag {
+      font-size: 12px;
+      color: var(--hint);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Cards ── */
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .nav-card {
+      display: block;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 1.5rem;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    .nav-card:active { transform: scale(0.99); }
+
+    .nav-card.teal:hover {
+      border-color: var(--teal-200);
+      box-shadow: 0 0 0 3px rgba(29,158,117,0.08);
+    }
+    .nav-card.coral:hover {
+      border-color: #D85A30;
+      box-shadow: 0 0 0 3px rgba(216,90,48,0.08);
+    }
+
+    .nav-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 1rem;
+    }
+    .nav-icon.teal  { background: var(--teal-50);  color: var(--teal-600); }
+    .nav-icon.coral { background: var(--coral-50); color: var(--coral-600); }
+
+    .nav-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      margin: 0 0 6px;
+    }
+    .nav-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 14px;
+      line-height: 1.5;
+    }
+    .nav-arrow {
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-card.teal  .nav-arrow { color: var(--teal-600); }
+    .nav-card.coral .nav-arrow { color: var(--coral-600); }
+
+    .theme-btn {
+      margin-left: auto;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .theme-btn:hover {
+      border-color: var(--teal-200);
+      color: var(--teal-600);
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+
+    <div class="brand">
+      <span class="brand-name">SIGMA</span>
+      <span class="brand-tag">SISTEMA INTELIGENTE DE GESTÃO MÉDICA E ANÁLISES</span>
+      <button id="themeBtn" class="theme-btn" onclick="alternarTema()">
+        <i class="ti ti-moon" aria-hidden="true"></i> Escuro
+      </button>
+    </div>
+
+    <div class="cards-row">
+
+      <!-- Card 1: Busca de medicamentos -->
+      <a href="consulta.html" class="nav-card teal">
+        <div class="nav-icon teal" aria-hidden="true"><i class="ti ti-pill"></i></div>
+        <p class="nav-title">Buscar medicamento</p>
+        <p class="nav-sub">Pesquise por nome, categoria ou via de administração e veja todos os detalhes.</p>
+        <span class="nav-arrow">Acessar <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+      <!-- Card 2: Verificação de interações -->
+      <a href="interacoes.html" class="nav-card coral">
+        <div class="nav-icon coral" aria-hidden="true"><i class="ti ti-shield-check"></i></div>
+        <p class="nav-title">Verificar interação</p>
+        <p class="nav-sub">Selecione dois medicamentos e veja se há interação conhecida entre eles.</p>
+        <span class="nav-arrow">Acessar <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+    </div>
+
+  </main>
+</body>
+</html>
