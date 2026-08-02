@@ -1,23 +1,32 @@
 {
   "name": "SIGMA",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
+  "version": "1.3.0",
+  "description": "Gestão Médica e Análise",
+  "main": "public/main.js",
   "scripts": {
-    "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron-forge start",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "keywords": [],
-  "author": "",
+  "author": "Guilherme Terra",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.6",
+    "electron-squirrel-startup": "^1.0.1",
     "express": "^5.2.1",
-    "sql.js": "^1.14.1",
-    "sqlite": "^5.1.1",
-    "sqlite3": "^6.0.1"
+    "sql.js": "^1.14.1"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.11.2",
+    "@electron-forge/maker-deb": "^7.11.2",
+    "@electron-forge/maker-rpm": "^7.11.2",
+    "@electron-forge/maker-squirrel": "^7.11.2",
+    "@electron-forge/maker-zip": "^7.11.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.11.2",
+    "@electron-forge/plugin-fuses": "^7.11.2",
+    "@electron/fuses": "^1.8.0",
     "electron": "^42.4.0",
     "electron-rebuild": "^3.2.9"
   }

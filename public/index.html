@@ -69,6 +69,8 @@
       --teal-600: #5DCAA5;
       --coral-50:  #412105;
       --coral-600: #F0997B;
+      --tuna-50:  #534AB7;
+      --tuna-600: #36316d;
     }
 
     html.dark-loading { background: #1c1c1a; }
@@ -134,6 +136,10 @@
       border-color: #D85A30;
       box-shadow: 0 0 0 3px rgba(216,90,48,0.08);
     }
+    .nav-card.tuna:hover {
+      border-color: #534AB7;
+      box-shadow: 0 0 0 3px rgba(6, 2, 41, 0.08)
+    }
 
     .nav-icon {
       width: 44px;
@@ -147,6 +153,7 @@
     }
     .nav-icon.teal  { background: var(--teal-50);  color: var(--teal-600); }
     .nav-icon.coral { background: var(--coral-50); color: var(--coral-600); }
+    .nav-icon.tuna  { background: var(--tuna-50); color: var(--tuna-600); }
 
     .nav-title {
       font-size: 16px;
@@ -169,6 +176,7 @@
     }
     .nav-card.teal  .nav-arrow { color: var(--teal-600); }
     .nav-card.coral .nav-arrow { color: var(--coral-600); }
+    .nav-card.tuna .nav-arrow  { color: var(--tuna-600); }
 
     .theme-btn {
       margin-left: auto;
@@ -216,6 +224,17 @@
         <span class="nav-arrow">Acessar <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
       </a>
 
+      <!-- Card 3: Fichas de pacientes -->
+      <a href="pacientes.html" class="nav-card tuna">
+        <div class="nav-icon tuna" style="background: #EEF0FE; color: #534AB7;" aria-hidden="true">
+        <i class="ti ti-users"></i>
+</div>
+        <p class="nav-title">Fichas de pacientes</p>
+        <p class="nav-sub">Crie e gerencie fichas com informações e lista de medicamentos de cada paciente.</p>
+        <span class="nav-arrow">
+          Acessar <i class="ti ti-arrow-right" aria-hidden="true"></i>
+        </span>
+      </a>
     </div>
 
   </main>

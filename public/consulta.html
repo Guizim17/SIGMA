@@ -306,7 +306,6 @@
 
 <script>
   // ── CONFIGURAÇÃO ─────────────────────────────
-  // API EM PRODUÇÃO
   const API_BASE = "http://localhost:5000";
 
   let filtroVia = "";
@@ -317,13 +316,75 @@
     doSearch();
   }
 
+  function renderResultados(dados, tituloVazio, tituloPreenchido) {
+    const lista = document.getElementById("resultsList");
+    const title = document.getElementById("resultsTitle");
+
+    if (!Array.isArray(dados) || dados.length === 0) {
+      title.textContent = tituloVazio;
+      lista.innerHTML = `
+        <div class="result-empty">
+          <i class="ti ti-mood-empty" style="font-size:20px;" aria-hidden="true"></i>
+          Tente outro nome ou categoria
+        </div>`;
+      return;
+    }
+
+    const plural = dados.length !== 1;
+    title.textContent = tituloPreenchido || `${dados.length} resultado${plural?"s":""} encontrado${plural?"s":""}`;
+
+    lista.innerHTML = dados.map(m => `
+      <div class="result-card" role="button" tabindex="0"
+        onclick="abrirDetalhe(${m.id})"
+        onkeydown="if(event.key==='Enter') abrirDetalhe(${m.id})">
+        <div class="result-icon" aria-hidden="true"><i class="ti ti-pill"></i></div>
+        <div class="result-info">
+          <p class="result-name">${m.nome_medicamento}</p>
+          <p class="result-sub">${m.categoria || "—"}</p>
+        </div>
+        <span class="result-badge">${m.via_administracao || "—"}</span>
+      </div>
+    `).join("");
+  }
+
+  async function carregarListaInicial() {
+    const area  = document.getElementById("resultsArea");
+    const lista = document.getElementById("resultsList");
+    const title = document.getElementById("resultsTitle");
+
+    area.style.display = "block";
+    title.textContent  = "Carregando…";
+    lista.innerHTML    = [1,2,3].map(() => `<div class="skeleton"></div>`).join("");
+
+    try {
+      const res   = await fetch(`${API_BASE}/medicamentos/iniciais`);
+      let dados   = await res.json();
+
+      if (filtroVia) {
+        dados = dados.filter(m =>
+          (m.via_administracao || "").toLowerCase().includes(filtroVia.toLowerCase())
+        );
+      }
+
+      renderResultados(dados, "Nenhum medicamento cadastrado", "Medicamentos (ordem alfabética)");
+    } catch (err) {
+      title.textContent = "Erro ao conectar com a API";
+      lista.innerHTML = `
+        <div class="result-empty">
+          <i class="ti ti-wifi-off" style="font-size:20px;" aria-hidden="true"></i>
+          Verifique se o servidor está rodando em ${API_BASE}
+        </div>`;
+      console.error(err);
+    }
+  }
+
   async function doSearch() {
     const query = document.getElementById("searchInput").value.trim();
     const area  = document.getElementById("resultsArea");
     const lista = document.getElementById("resultsList");
     const title = document.getElementById("resultsTitle");
 
-    if (!query) { area.style.display = "none"; return; }
+    if (!query) { carregarListaInicial(); return; }
 
     area.style.display = "block";
     title.textContent  = "Buscando…";
@@ -339,32 +400,7 @@
         );
       }
 
-      if (!Array.isArray(dados) || dados.length === 0) {
-        title.textContent = `Nenhum resultado para "${query}"`;
-        lista.innerHTML = `
-          <div class="result-empty">
-            <i class="ti ti-mood-empty" style="font-size:20px;" aria-hidden="true"></i>
-            Tente outro nome ou categoria
-          </div>`;
-        return;
-      }
-
-      const plural = dados.length !== 1;
-      title.textContent = `${dados.length} resultado${plural?"s":""} encontrado${plural?"s":""}`;
-
-      lista.innerHTML = dados.map(m => `
-        <div class="result-card" role="button" tabindex="0"
-          onclick="abrirDetalhe(${m.id})"
-          onkeydown="if(event.key==='Enter') abrirDetalhe(${m.id})">
-          <div class="result-icon" aria-hidden="true"><i class="ti ti-pill"></i></div>
-          <div class="result-info">
-            <p class="result-name">${m.nome_medicamento}</p>
-            <p class="result-sub">${m.categoria || "—"}</p>
-          </div>
-          <span class="result-badge">${m.via_administracao || "—"}</span>
-        </div>
-      `).join("");
-
+      renderResultados(dados, `Nenhum resultado para "${query}"`);
     } catch (err) {
       title.textContent = "Erro ao conectar com a API";
       lista.innerHTML = `
@@ -424,11 +460,19 @@
     el.classList.add("active");
     filtroVia = el.dataset.via;
     if (document.getElementById("searchInput").value.trim()) doSearch();
+    else carregarListaInicial();
   }
 
   // ── TECLADO ──────────────────────────────────
   document.getElementById("searchInput").addEventListener("keydown", e => {
     if (e.key === "Enter") doSearch();
+  });
+
+  // ── BUSCA EM TEMPO REAL (enquanto digita) ─────
+  let debounceTimer = null;
+  document.getElementById("searchInput").addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(doSearch, 250);
   });
   document.addEventListener("keydown", e => {
     if (e.key === "Escape") document.getElementById("modalOverlay").classList.remove("open");
@@ -451,6 +495,7 @@
       btn.innerHTML = `<i class="ti ti-sun" aria-hidden="true"></i> Claro`;
     }
     document.documentElement.classList.remove("dark-loading");
+    carregarListaInicial();
   });
 </script>
 </body>

@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGMA — Fichas de Pacientes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+  <script>
+    if (localStorage.getItem("tema") === "dark") {
+      document.documentElement.classList.add("dark-loading");
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff; --surface: #f6f5f0;
+      --border: rgba(0,0,0,0.10); --border-strong: rgba(0,0,0,0.20);
+      --text: #1a1a18; --muted: #6b6b68; --hint: #a0a09c;
+      --teal-50: #E1F5EE; --teal-200: #5DCAA5; --teal-400: #1D9E75; --teal-600: #0F6E56;
+      --purple-50: #EEEDFE; --purple-200: #AFA9EC; --purple-400: #534AB7; --purple-600: #3C3489;
+      --red-50: #FCEBEB; --red-200: #F09595; --red-600: #A32D2D;
+      --amber-50: #FAEEDA; --amber-600: #854F0B;
+      --radius-md: 8px; --radius-lg: 12px;
+    }
+    html.dark-loading { background: #1c1c1a; }
+    /*
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a; --surface: #242422;
+        --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.20);
+        --text: #f0efe8; --muted: #9a9a96; --hint: #5e5e5a;
+        --teal-50: #04342C; --teal-200: #1D9E75; --teal-600: #5DCAA5;
+        --purple-50: #1a1845; --purple-200: #534AB7; --purple-400: #AFA9EC; --purple-600: #CECBF6;
+        --red-50: #501313; --red-200: #E24B4A; --red-600: #F09595;
+        --amber-50: #412402; --amber-600: #FAC775;
+      }
+    }
+      */
+    body.dark {
+      --bg: #1c1c1a; --surface: #242422;
+      --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.20);
+      --text: #f0efe8; --muted: #9a9a96; --hint: #5e5e5a;
+      --teal-50: #04342C; --teal-200: #1D9E75; --teal-600: #5DCAA5;
+      --purple-50: #1a1845; --purple-200: #534AB7; --purple-400: #AFA9EC; --purple-600: #CECBF6;
+      --red-50: #501313; --red-200: #E24B4A; --red-600: #F09595;
+      --amber-50: #412402; --amber-600: #FAC775;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; }
+
+    .page { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+
+    /* Brand */
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 2.5rem; }
+    .brand-name { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); letter-spacing: -0.5px; }
+    .brand-tag { font-size: 12px; color: var(--hint); letter-spacing: 0.06em; text-transform: uppercase; }
+    .back-btn, .theme-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 999px;
+      border: 0.5px solid var(--border-strong); color: var(--muted);
+      text-decoration: none; background: var(--bg); cursor: pointer;
+      font-size: 13px; transition: all 0.15s;
+    }
+    .theme-btn { margin-left: auto; width: auto; padding: 0 14px; gap: 6px; }
+    .back-btn:hover, .theme-btn:hover { border-color: var(--teal-200); color: var(--teal-600); }
+
+    /* Layout duas colunas */
+    .layout { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: start; }
+    @media (max-width: 640px) { .layout { grid-template-columns: 1fr; } }
+
+    /* Coluna esquerda — lista de pacientes */
+    .col-lista { position: sticky; top: 24px; }
+    .col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .col-title { font-size: 13px; font-weight: 500; color: var(--text); }
+    .btn-novo {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--purple-400); color: #fff;
+      border: none; border-radius: 999px;
+      padding: 5px 12px; font-size: 12px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: opacity 0.15s;
+    }
+    .btn-novo:hover { opacity: 0.88; }
+
+    .lista-pacientes { display: flex; flex-direction: column; gap: 6px; max-height: 560px; overflow-y: auto; }
+    .paciente-item {
+      background: var(--bg); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 12px 14px;
+      cursor: pointer; transition: border-color 0.12s, box-shadow 0.12s;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .paciente-item:hover { border-color: var(--purple-200); }
+    .paciente-item.ativo { border-color: var(--purple-400); box-shadow: 0 0 0 3px rgba(83,74,183,0.10); }
+    .paciente-avatar {
+      width: 34px; height: 34px; border-radius: 999px;
+      background: var(--purple-50); color: var(--purple-400);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0; font-weight: 500;
+    }
+    .paciente-info { flex: 1; min-width: 0; }
+    .paciente-nome { font-size: 13px; font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .paciente-meta { font-size: 11px; color: var(--muted); }
+    .paciente-alerta { color: var(--red-600); font-size: 14px; flex-shrink: 0; }
+
+    .lista-vazia { text-align: center; padding: 32px 16px; font-size: 13px; color: var(--muted); }
+
+    /* Coluna direita — ficha do paciente */
+    .ficha-vazia {
+      background: var(--bg); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 48px 24px;
+      text-align: center; color: var(--muted); font-size: 13px;
+    }
+    .ficha-vazia i { font-size: 32px; display: block; margin-bottom: 12px; color: var(--hint); }
+
+    .ficha {
+      background: var(--bg); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 24px;
+      display: none;
+    }
+    .ficha.show { display: block; }
+
+    .ficha-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+    .ficha-nome { font-size: 20px; font-weight: 500; color: var(--text); }
+    .ficha-meta { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .btn-excluir {
+      display: flex; align-items: center; gap: 5px;
+      background: none; border: 0.5px solid var(--border-strong);
+      border-radius: 999px; padding: 5px 12px;
+      font-size: 12px; color: var(--muted);
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+    }
+    .btn-excluir:hover { border-color: var(--red-200); color: var(--red-600); }
+
+    .ficha-divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    .ficha-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .ficha-campo-label { font-size: 11px; color: var(--hint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .ficha-campo-valor { font-size: 13px; color: var(--text); }
+
+    /* Seção de medicamentos da ficha */
+    .secao-title {
+      font-size: 12px; font-weight: 500; color: var(--hint);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .med-ficha-row {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface); border-radius: var(--radius-md);
+      padding: 9px 12px; margin-bottom: 6px;
+      border: 0.5px solid transparent;
+      transition: border-color 0.12s;
+    }
+    .med-ficha-row.conflito { border-color: var(--red-200); background: var(--red-50); }
+    .med-ficha-icon {
+      width: 28px; height: 28px; border-radius: var(--radius-md);
+      background: var(--teal-50); color: var(--teal-600);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0;
+    }
+    .med-ficha-row.conflito .med-ficha-icon { background: var(--red-50); color: var(--red-600); }
+    .med-ficha-nome { flex: 1; font-size: 13px; color: var(--text); }
+    .med-ficha-conflito-label { font-size: 11px; color: var(--red-600); }
+    .btn-remover-med {
+      background: none; border: none; cursor: pointer;
+      color: var(--hint); font-size: 15px; padding: 2px;
+      transition: color 0.12s;
+    }
+    .btn-remover-med:hover { color: var(--red-600); }
+
+    /* Adicionar medicamento */
+    .add-med-row { display: flex; gap: 8px; margin-top: 10px; position: relative; }
+    .add-med-input {
+      flex: 1; border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md); background: var(--bg);
+      font-family: 'DM Sans', sans-serif; font-size: 13px;
+      color: var(--text); padding: 9px 12px; outline: none;
+      transition: border-color 0.15s;
+    }
+    .add-med-input:focus { border-color: var(--teal-200); }
+    .add-med-input::placeholder { color: var(--hint); }
+    .btn-add-med {
+      background: var(--teal-400); color: #fff;
+      border: none; border-radius: var(--radius-md);
+      padding: 0 14px; font-size: 13px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s; white-space: nowrap;
+    }
+    .btn-add-med:hover { background: var(--teal-600); }
+
+    .add-suggestions {
+      position: absolute; top: calc(100% + 4px); left: 0;
+      right: 60px; background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      max-height: 180px; overflow-y: auto;
+      z-index: 10; display: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .add-sug-item {
+      padding: 9px 12px; font-size: 13px; cursor: pointer;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .add-sug-item:last-child { border-bottom: none; }
+    .add-sug-item:hover { background: var(--surface); }
+
+    /* Painel de conflitos */
+    .conflitos-painel {
+      background: var(--red-50); border: 0.5px solid var(--red-200);
+      border-radius: var(--radius-lg); padding: 14px 16px;
+      margin-top: 16px; display: none;
+    }
+    .conflitos-painel.show { display: block; }
+    .conflitos-title {
+      font-size: 12px; font-weight: 500; color: var(--red-600);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .conflito-item { font-size: 13px; color: var(--text); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 0.5px solid var(--red-200); }
+    .conflito-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .conflito-par { font-weight: 500; color: var(--red-600); margin-bottom: 3px; }
+    .conflito-detalhe { font-size: 12px; color: var(--muted); }
+
+    /* Modal de novo paciente */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 100;
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg); border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      width: 100%; max-width: 480px; padding: 1.5rem;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .modal-title { font-size: 16px; font-weight: 500; color: var(--text); }
+    .modal-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 18px; padding: 4px;
+      border-radius: var(--radius-md); transition: background 0.12s;
+    }
+    .modal-close:hover { background: var(--surface); }
+
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-size: 12px; color: var(--muted); margin-bottom: 5px; display: block; }
+    .form-input, .form-textarea {
+      width: 100%; border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md); background: var(--bg);
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      color: var(--text); padding: 10px 12px; outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus, .form-textarea:focus { border-color: var(--teal-200); }
+    .form-textarea { resize: vertical; min-height: 72px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .btn-salvar {
+      width: 100%; background: var(--purple-400); color: #fff;
+      border: none; border-radius: var(--radius-md);
+      padding: 11px; font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      transition: opacity 0.15s; margin-top: 4px;
+    }
+    .btn-salvar:hover { opacity: 0.88; }
+  </style>
+</head>
+<body>
+<main class="page">
+  <div class="brand">
+    <a href="index.html" class="back-btn" aria-label="Voltar ao início">
+      <i class="ti ti-arrow-left" aria-hidden="true"></i>
+    </a>
+    <span class="brand-name">SIGMA</span>
+    <span class="brand-tag">Fichas de pacientes</span>
+    <button id="themeBtn" class="theme-btn" onclick="alternarTema()">
+      <i class="ti ti-moon" aria-hidden="true"></i> Escuro
+    </button>
+  </div>
+
+  <div class="layout">
+    <!-- Coluna esquerda: lista de pacientes -->
+    <div class="col-lista">
+      <div class="col-header">
+        <span class="col-title">Pacientes</span>
+        <button class="btn-novo" onclick="abrirModalNovo()">
+          <i class="ti ti-plus" aria-hidden="true"></i> Novo
+        </button>
+      </div>
+      <div class="lista-pacientes" id="listaPacientes">
+        <div class="lista-vazia">Carregando…</div>
+      </div>
+    </div>
+
+    <!-- Coluna direita: ficha -->
+    <div>
+      <div class="ficha-vazia" id="fichaVazia">
+        <i class="ti ti-user-circle" aria-hidden="true"></i>
+        Selecione um paciente ou crie uma nova ficha
+      </div>
+
+      <div class="ficha" id="fichaDetalhe">
+        <div class="ficha-header">
+          <div>
+            <p class="ficha-nome" id="fichaNome"></p>
+            <p class="ficha-meta" id="fichaMeta"></p>
+          </div>
+          <button class="btn-excluir" onclick="excluirPaciente()">
+            <i class="ti ti-trash" aria-hidden="true"></i> Excluir ficha
+          </button>
+        </div>
+
+        <div class="ficha-grid">
+          <div>
+            <p class="ficha-campo-label">Idade</p>
+            <p class="ficha-campo-valor" id="fichaIdade">—</p>
+          </div>
+          <div>
+            <p class="ficha-campo-label">Peso</p>
+            <p class="ficha-campo-valor" id="fichaPeso">—</p>
+          </div>
+          <div>
+            <p class="ficha-campo-label">Alergias</p>
+            <p class="ficha-campo-valor" id="fichaAlergias">—</p>
+          </div>
+          <div>
+            <p class="ficha-campo-label">Observações</p>
+            <p class="ficha-campo-valor" id="fichaObs">—</p>
+          </div>
+        </div>
+
+        <div class="ficha-divider"></div>
+
+        <p class="secao-title">Medicamentos em uso</p>
+        <div id="listaMedFicha"></div>
+
+        <div class="add-med-row">
+          <input
+            class="add-med-input"
+            id="addMedInput"
+            type="text"
+            placeholder="Adicionar medicamento…"
+            autocomplete="off"
+            oninput="buscarAddSugestoes()"
+          />
+          <div class="add-suggestions" id="addSuggestions"></div>
+          <button class="btn-add-med" onclick="adicionarMedicamento()">
+            <i class="ti ti-plus" aria-hidden="true"></i> Adicionar
+          </button>
+        </div>
+
+        <div class="conflitos-painel" id="conflitosPainel">
+          <p class="conflitos-title">
+            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+            Interações detectadas
+          </p>
+          <div id="conflitosLista"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal novo paciente -->
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <p class="modal-title">Nova ficha de paciente</p>
+      <button class="modal-close" onclick="fecharModal()" aria-label="Fechar">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="inputNome">Nome completo *</label>
+      <input class="form-input" id="inputNome" type="text" placeholder="Nome do paciente" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="inputIdade">Idade</label>
+        <input class="form-input" id="inputIdade" type="number" placeholder="Ex: 45" min="0" max="120" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inputPeso">Peso (kg)</label>
+        <input class="form-input" id="inputPeso" type="number" placeholder="Ex: 70.5" step="0.1" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="inputAlergias">Alergias conhecidas</label>
+      <input class="form-input" id="inputAlergias" type="text" placeholder="Ex: Penicilina, AAS" />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="inputObs">Observações</label>
+      <textarea class="form-textarea" id="inputObs" placeholder="Histórico relevante, condições…"></textarea>
+    </div>
+    <button class="btn-salvar" onclick="salvarNovoPaciente()">Salvar ficha</button>
+  </div>
+</div>
+
+<script>
+  const API_BASE = "http://localhost:5000";
+  let pacienteAtualId = null;
+  let medSelecionadoAdd = null;
+
+  /* ── Carregar lista de pacientes ── */
+  async function carregarPacientes() {
+    const lista = document.getElementById("listaPacientes");
+    try {
+      const res  = await fetch(`${API_BASE}/pacientes`);
+      const dados = await res.json();
+      if (!dados.length) {
+        lista.innerHTML = `<div class="lista-vazia">Nenhum paciente cadastrado ainda.<br>Clique em "+ Novo" para começar.</div>`;
+        return;
+      }
+      lista.innerHTML = dados.map(p => `
+        <div class="paciente-item" id="item-${p.id}" onclick="abrirFicha(${p.id})">
+          <div class="paciente-avatar">${p.nome.charAt(0).toUpperCase()}</div>
+          <div class="paciente-info">
+            <p class="paciente-nome">${p.nome}</p>
+            <p class="paciente-meta">${p.idade ? p.idade + ' anos' : ''}${p.idade && p.peso ? ' · ' : ''}${p.peso ? p.peso + ' kg' : ''}</p>
+          </div>
+          <span class="paciente-alerta" id="alerta-${p.id}" style="display:none">
+            <i class="ti ti-alert-triangle"></i>
+          </span>
+        </div>
+      `).join("");
+    } catch (err) {
+      lista.innerHTML = `<div class="lista-vazia">Erro ao carregar pacientes.</div>`;
+    }
+  }
+
+  /* ── Abrir ficha de um paciente ── */
+  async function abrirFicha(id) {
+    pacienteAtualId = id;
+    document.querySelectorAll(".paciente-item").forEach(el => el.classList.remove("ativo"));
+    document.getElementById(`item-${id}`)?.classList.add("ativo");
+    document.getElementById("fichaVazia").style.display = "none";
+    document.getElementById("fichaDetalhe").classList.add("show");
+
+    try {
+      const res  = await fetch(`${API_BASE}/pacientes/${id}`);
+      const p    = await res.json();
+
+      document.getElementById("fichaNome").textContent    = p.nome;
+      document.getElementById("fichaMeta").textContent    = `Cadastrado em ${new Date(p.criado_em).toLocaleDateString('pt-BR')}`;
+      document.getElementById("fichaIdade").textContent   = p.idade ? `${p.idade} anos` : "—";
+      document.getElementById("fichaPeso").textContent    = p.peso  ? `${p.peso} kg`   : "—";
+      document.getElementById("fichaAlergias").textContent = p.alergias    || "—";
+      document.getElementById("fichaObs").textContent      = p.observacoes || "—";
+
+      renderizarMedFicha(p.medicamentos);
+      await verificarConflitos(p.medicamentos);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  /* ── Renderizar medicamentos da ficha ── */
+  function renderizarMedFicha(meds, conflitos = []) {
+    const lista = document.getElementById("listaMedFicha");
+    if (!meds.length) {
+      lista.innerHTML = `<p style="font-size:13px;color:var(--hint);margin-bottom:10px;">Nenhum medicamento adicionado ainda.</p>`;
+      return;
+    }
+    const nomesComConflito = new Set(conflitos.flatMap(c => [c.nomeA, c.nomeB]));
+    lista.innerHTML = meds.map(m => {
+      const temConflito = nomesComConflito.has(m.nome_medicamento);
+      return `
+        <div class="med-ficha-row ${temConflito ? 'conflito' : ''}" id="med-row-${m.id}">
+          <div class="med-ficha-icon"><i class="ti ti-pill"></i></div>
+          <span class="med-ficha-nome">${m.nome_medicamento}</span>
+          ${temConflito ? `<span class="med-ficha-conflito-label"><i class="ti ti-alert-triangle"></i> Interação</span>` : ''}
+          <button class="btn-remover-med" onclick="removerMedicamento(${m.id})" aria-label="Remover">
+            <i class="ti ti-x"></i>
+          </button>
+        </div>
+      `;
+    }).join("");
+  }
+
+  /* ── Verificar todos os pares de conflito ── */
+  async function verificarConflitos(meds) {
+    const painel  = document.getElementById("conflitosPainel");
+    const listaCo = document.getElementById("conflitosLista");
+    const alertaEl = document.getElementById(`alerta-${pacienteAtualId}`);
+
+    if (meds.length < 2) {
+      painel.classList.remove("show");
+      if (alertaEl) alertaEl.style.display = "none";
+      renderizarMedFicha(meds, []);
+      return;
+    }
+
+    const conflitos = [];
+    for (let i = 0; i < meds.length; i++) {
+      for (let j = i + 1; j < meds.length; j++) {
+        const nomeA = meds[i].nome_medicamento;
+        const nomeB = meds[j].nome_medicamento;
+        try {
+          const res  = await fetch(`${API_BASE}/interacao?a=${encodeURIComponent(nomeA)}&b=${encodeURIComponent(nomeB)}`);
+          const dados = await res.json();
+          if (dados.encontrada) {
+            conflitos.push({ nomeA, nomeB, gravidade: dados.gravidade, efeito: dados.efeito });
+          }
+        } catch (e) {}
+      }
+    }
+
+    renderizarMedFicha(meds, conflitos);
+
+    if (!conflitos.length) {
+      painel.classList.remove("show");
+      if (alertaEl) alertaEl.style.display = "none";
+      return;
+    }
+
+    if (alertaEl) alertaEl.style.display = "flex";
+    painel.classList.add("show");
+    listaCo.innerHTML = conflitos.map(c => `
+      <div class="conflito-item">
+        <p class="conflito-par"><i class="ti ti-alert-triangle"></i> ${c.nomeA} + ${c.nomeB}</p>
+        <p class="conflito-detalhe">${c.gravidade ? 'Gravidade: ' + c.gravidade + '. ' : ''}${c.efeito || ''}</p>
+      </div>
+    `).join("");
+  }
+
+  /* ── Adicionar medicamento ── */
+  async function buscarAddSugestoes() {
+    const input = document.getElementById("addMedInput");
+    const box   = document.getElementById("addSuggestions");
+    const q     = input.value.trim();
+    medSelecionadoAdd = null;
+    if (q.length < 1) { box.style.display = "none"; return; }
+    try {
+      const res  = await fetch(`${API_BASE}/buscar?q=${encodeURIComponent(q)}`);
+      const dados = await res.json();
+      if (!dados.length) { box.style.display = "none"; return; }
+      box.innerHTML = dados.map(m => `
+        <div class="add-sug-item" onclick="selecionarAddMed('${m.nome_medicamento.replace(/'/g, "\\'")}')">
+          ${m.nome_medicamento}
+        </div>
+      `).join("");
+      box.style.display = "block";
+    } catch (e) { box.style.display = "none"; }
+  }
+
+  function selecionarAddMed(nome) {
+    document.getElementById("addMedInput").value = nome;
+    document.getElementById("addSuggestions").style.display = "none";
+    medSelecionadoAdd = nome;
+  }
+
+  async function adicionarMedicamento() {
+    const nome = medSelecionadoAdd || document.getElementById("addMedInput").value.trim();
+    if (!nome || !pacienteAtualId) return;
+    try {
+      await fetch(`${API_BASE}/pacientes/${pacienteAtualId}/medicamentos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome_medicamento: nome })
+      });
+      document.getElementById("addMedInput").value = "";
+      medSelecionadoAdd = null;
+      await abrirFicha(pacienteAtualId);
+    } catch (err) { console.error(err); }
+  }
+
+  /* ── Remover medicamento ── */
+  async function removerMedicamento(midId) {
+    if (!pacienteAtualId) return;
+    try {
+      await fetch(`${API_BASE}/pacientes/${pacienteAtualId}/medicamentos/${midId}`, { method: "DELETE" });
+      await abrirFicha(pacienteAtualId);
+    } catch (err) { console.error(err); }
+  }
+
+  /* ── Excluir paciente ── */
+  async function excluirPaciente() {
+    if (!pacienteAtualId) return;
+    if (!confirm("Tem certeza que deseja excluir esta ficha? A ação não pode ser desfeita.")) return;
+    try {
+      await fetch(`${API_BASE}/pacientes/${pacienteAtualId}`, { method: "DELETE" });
+      pacienteAtualId = null;
+      document.getElementById("fichaDetalhe").classList.remove("show");
+      document.getElementById("fichaVazia").style.display = "";
+      await carregarPacientes();
+    } catch (err) { console.error(err); }
+  }
+
+  /* ── Modal novo paciente ── */
+  function abrirModalNovo() {
+    document.getElementById("inputNome").value = "";
+    document.getElementById("inputIdade").value = "";
+    document.getElementById("inputPeso").value = "";
+    document.getElementById("inputAlergias").value = "";
+    document.getElementById("inputObs").value = "";
+    document.getElementById("modalOverlay").classList.add("open");
+    setTimeout(() => document.getElementById("inputNome").focus(), 50);
+  }
+
+  function fecharModal(event) {
+    if (event && event.target !== document.getElementById("modalOverlay")) return;
+    document.getElementById("modalOverlay").classList.remove("open");
+  }
+
+  async function salvarNovoPaciente() {
+    const nome = document.getElementById("inputNome").value.trim();
+    if (!nome) { document.getElementById("inputNome").focus(); return; }
+    try {
+      const res  = await fetch(`${API_BASE}/pacientes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome,
+          idade: document.getElementById("inputIdade").value || null,
+          peso:  document.getElementById("inputPeso").value  || null,
+          alergias:    document.getElementById("inputAlergias").value || null,
+          observacoes: document.getElementById("inputObs").value      || null,
+        })
+      });
+      const dados = await res.json();
+      document.getElementById("modalOverlay").classList.remove("open");
+      await carregarPacientes();
+      abrirFicha(dados.id);
+    } catch (err) { console.error(err); }
+  }
+
+  /* Fecha sugestões ao clicar fora */
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".add-med-row")) {
+      document.getElementById("addSuggestions").style.display = "none";
+    }
+  });
+
+  /* Enter no campo de adicionar */
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("addMedInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") adicionarMedicamento();
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") document.getElementById("modalOverlay").classList.remove("open");
+    });
+  });
+
+  /* ── Tema ── */
+  function alternarTema() {
+    const btn = document.getElementById("themeBtn");
+    document.body.classList.toggle("dark");
+    const estaEscuro = document.body.classList.contains("dark");
+    localStorage.setItem("tema", estaEscuro ? "dark" : "light");
+    btn.innerHTML = estaEscuro
+      ? `<i class="ti ti-sun" aria-hidden="true"></i> Claro`
+      : `<i class="ti ti-moon" aria-hidden="true"></i> Escuro`;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("themeBtn");
+    if (localStorage.getItem("tema") === "dark") {
+      document.body.classList.add("dark");
+      btn.innerHTML = `<i class="ti ti-sun" aria-hidden="true"></i> Claro`;
+    }
+    document.documentElement.classList.remove("dark-loading");
+    carregarPacientes();
+  });
+</script>
+</body>
+</html>

@@ -294,7 +294,12 @@
     .resultado-card.moderada .resultado-titulo { color: var(--amber-600); }
     .resultado-card.leve     .resultado-titulo { color: var(--green-600); }
     .resultado-card.neutro   .resultado-titulo { color: var(--text); }
-    .resultado-texto { font-size: 13px; color: var(--text); line-height: 1.5; }
+    .resultado-texto {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+      white-space: pre-line; /* respeita as quebras de linha do \n\n */
+    }
 
     /* ── Divider ── */
     .divider { height: 1px; background: var(--border); margin: 2.5rem 0 1.5rem; }
@@ -545,7 +550,7 @@
       destacarSelecao(qual, null);
 
       if (query.length < 1) { box.style.display = "none"; return; }
-
+      /*
       try {
         const res = await fetch(`${API_BASE}/buscar?q=${encodeURIComponent(query)}`);
         const dados = await res.json();
@@ -566,7 +571,9 @@
         box.style.display = "none";
         console.error(err);
       }
+      */
     }
+    
 
     function selecionarMedicamento(qual, id, nome) {
       document.getElementById(`med${qual}_input`).value = nome;
@@ -594,46 +601,73 @@
     });
 
     /* ── Verificação de interação ── */
-    /* Esta função depende da rota /interacao no api.js e da tabela
-       interacoes_conhecidas, que ainda serão criadas. Por enquanto
-       mostra um aviso amigável caso a rota não exista. */
     async function verificarInteracao() {
-      const idA = document.getElementById("medA_id").value;
-      const idB = document.getElementById("medB_id").value;
-      const nomeA = document.getElementById("medA_input").value;
-      const nomeB = document.getElementById("medB_input").value;
+      const nomeA = document.getElementById("medA_input").value.trim();
+      const nomeB = document.getElementById("medB_input").value.trim();
+      const idA   = document.getElementById("medA_id").value;
+      const idB   = document.getElementById("medB_id").value;
 
+      // Valida se ambos foram selecionados
       if (!idA || !idB) {
-        mostrarResultado("neutro", "ti-info-circle", "Selecione os dois medicamentos",
-          "Escolha um item da lista de sugestões para cada campo antes de verificar.");
+        mostrarResultado("neutro", "ti-info-circle",
+          "Selecione os dois medicamentos",
+          "Escolha um item da lista para cada campo antes de verificar.");
+        return;
+      }
+
+      // Não faz sentido verificar um medicamento com ele mesmo
+      if (idA === idB) {
+        mostrarResultado("neutro", "ti-info-circle",
+          "Selecione medicamentos diferentes",
+          "Os dois campos estão com o mesmo medicamento.");
         return;
       }
 
       try {
-        const res = await fetch(`${API_BASE}/interacao?a=${idA}&b=${idB}`);
+        const url = `${API_BASE}/interacao?a=${encodeURIComponent(nomeA)}&b=${encodeURIComponent(nomeB)}`;
+        const res  = await fetch(url);
+        const dados = await res.json();
 
-        if (res.status === 404) {
-          mostrarResultado("neutro", "ti-tools", "Funcionalidade em construção",
-            "A rota de verificação de interação ainda não foi criada na API. Isso será feito quando a tabela de interações estiver pronta.");
+        // Par não existe na tabela
+        if (dados.semDados) {
+          mostrarResultado("neutro", "ti-circle-dashed",
+            "Par não catalogado",
+            `Não há registro de interação entre ${nomeA} e ${nomeB} na nossa base. Isso não garante segurança — consulte um profissional de saúde.`);
           return;
         }
 
-        const dados = await res.json();
-
-        if (dados.encontrada) {
-          const gravidade = (dados.gravidade || "moderada").toLowerCase();
-          const icone = gravidade === "grave" ? "ti-alert-triangle" : gravidade === "leve" ? "ti-info-circle" : "ti-alert-circle";
-          mostrarResultado(gravidade, icone,
-            `Interação ${dados.gravidade || "conhecida"} encontrada`,
-            dados.descricao || `${nomeA} e ${nomeB} possuem interação registrada no banco de dados.`);
-        } else {
-          mostrarResultado("neutro", "ti-circle-check",
-            "Nenhuma interação catalogada",
-            `Não há registro de interação entre ${nomeA} e ${nomeB} no nosso banco. Isso não garante que sejam seguros juntos — consulte um profissional de saúde.`);
+        // Par existe mas sem interação relevante
+        if (!dados.encontrada) {
+          mostrarResultado("leve", "ti-circle-check",
+            "Nenhuma interação relevante encontrada",
+            `${nomeA} e ${nomeB} foram analisados e não apresentam interação clínica relevante registrada.`);
+          return;
         }
+
+        // Interação encontrada — define cor pelo grau de gravidade
+        const g = (dados.gravidade || "").toLowerCase();
+        const tipo  = g.includes("grave")    ? "grave"
+                    : g.includes("moderada") ? "moderada"
+                    : "leve";
+        const icone = tipo === "grave"    ? "ti-alert-triangle"
+                    : tipo === "moderada" ? "ti-alert-circle"
+                    : "ti-info-circle";
+
+        // Monta o texto de detalhe com as informações disponíveis
+        const linhas = [];
+        if (dados.gravidade)    linhas.push(`Gravidade: ${dados.gravidade}`);
+        if (dados.mecanismo)    linhas.push(`Mecanismo: ${dados.mecanismo}`);
+        if (dados.efeito)       linhas.push(`Efeito clínico: ${dados.efeito}`);
+        if (dados.recomendacao) linhas.push(`Recomendação: ${dados.recomendacao}`);
+
+        mostrarResultado(tipo, icone,
+          `Interação ${dados.gravidade || "conhecida"} detectada`,
+          linhas.join("\n\n"));
+
       } catch (err) {
-        mostrarResultado("neutro", "ti-wifi-off", "Erro ao conectar com a API",
-          `Verifique se o servidor está rodando em ${API_BASE}`);
+        mostrarResultado("neutro", "ti-wifi-off",
+          "Erro ao conectar com a API",
+          `Verifique se o servidor está rodando em ${API_BASE}.`);
         console.error(err);
       }
     }
