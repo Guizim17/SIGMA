@@ -289,10 +289,16 @@
     <div class="col-lista">
       <div class="col-header">
         <span class="col-title">Pacientes</span>
-        <button class="btn-novo" onclick="abrirModalNovo()">
-          <i class="ti ti-plus" aria-hidden="true"></i> Novo
-        </button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-novo" style="background:var(--teal-400);" onclick="document.getElementById('inputImportar').click()">
+            <i class="ti ti-upload" aria-hidden="true"></i> Importar
+          </button>
+          <button class="btn-novo" onclick="abrirModalNovo()">
+            <i class="ti ti-plus" aria-hidden="true"></i> Novo
+          </button>
+        </div>
       </div>
+      <input type="file" id="inputImportar" accept="application/pdf" style="display:none" onchange="importarFichaArquivo(event)" />
       <div class="lista-pacientes" id="listaPacientes">
         <div class="lista-vazia">Carregando…</div>
       </div>
@@ -311,9 +317,14 @@
             <p class="ficha-nome" id="fichaNome"></p>
             <p class="ficha-meta" id="fichaMeta"></p>
           </div>
-          <button class="btn-excluir" onclick="excluirPaciente()">
-            <i class="ti ti-trash" aria-hidden="true"></i> Excluir ficha
-          </button>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-excluir" onclick="exportarFicha()">
+              <i class="ti ti-download" aria-hidden="true"></i> Exportar ficha (PDF)
+            </button>
+            <button class="btn-excluir" onclick="excluirPaciente()">
+              <i class="ti ti-trash" aria-hidden="true"></i> Excluir ficha
+            </button>
+          </div>
         </div>
 
         <div class="ficha-grid">
@@ -590,6 +601,49 @@
       document.getElementById("fichaVazia").style.display = "";
       await carregarPacientes();
     } catch (err) { console.error(err); }
+  }
+
+  /* ── Exportar ficha em PDF ── */
+  function exportarFicha() {
+    if (!pacienteAtualId) return;
+    window.open(`${API_BASE}/pacientes/${pacienteAtualId}/exportar`, "_blank");
+  }
+
+  /* ── Importar ficha a partir de um PDF ── */
+  async function importarFichaArquivo(event) {
+    const arquivo = event.target.files[0];
+    event.target.value = "";
+    if (!arquivo) return;
+    const buffer = await arquivo.arrayBuffer();
+    await enviarImportacao(buffer, false);
+  }
+
+  async function enviarImportacao(buffer, forcar) {
+    try {
+      const url = `${API_BASE}/pacientes/importar${forcar ? "?forcar=true" : ""}`;
+      const res  = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/pdf" },
+        body: buffer,
+      });
+      const dados = await res.json();
+
+      if (res.status === 409) {
+        const ex = dados.existente;
+        const confirmar = confirm(
+          `Já existe um paciente parecido: "${ex.nome}"${ex.idade ? `, ${ex.idade} anos` : ""}.\nImportar mesmo assim como um novo cadastro?`
+        );
+        if (confirmar) await enviarImportacao(buffer, true);
+        return;
+      }
+      if (!res.ok) { alert(dados.erro || "Erro ao importar a ficha."); return; }
+
+      await carregarPacientes();
+      abrirFicha(dados.id);
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao importar a ficha.");
+    }
   }
 
   /* ── Modal novo paciente ── */

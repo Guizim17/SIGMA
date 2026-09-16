@@ -40,18 +40,20 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:             #ffffff;
-      --surface:        #f6f5f0;
+      --bg:             #fcf1f1;
+      --surface:        #f3f1ed;
       --border:         rgba(0,0,0,0.10);
       --border-strong:  rgba(0,0,0,0.20);
       --text:           #1a1a18;
       --muted:          #6b6b68;
       --hint:           #a0a09c;
-      --teal-50:  #E1F5EE;
+      --teal-50:  #b8fce4;
       --teal-200: #5DCAA5;
       --teal-600: #0F6E56;
-      --coral-50:  #FAECE7;
+      --coral-50:  #f7c2af;
       --coral-600: #993C1D;
+      --tuna-50:  #90c1ee;
+      --tuna-600: #101288;
       --radius-md: 8px;
       --radius-lg: 12px;
     }
@@ -69,8 +71,8 @@
       --teal-600: #5DCAA5;
       --coral-50:  #412105;
       --coral-600: #F0997B;
-      --tuna-50:  #534AB7;
-      --tuna-600: #36316d;
+      --tuna-50:  #191647;
+      --tuna-600: #6889cf;
     }
 
     html.dark-loading { background: #1c1c1a; }
@@ -142,13 +144,13 @@
     }
 
     .nav-icon {
-      width: 44px;
-      height: 44px;
+      width: 56px;
+      height: 56px;
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 30px;
       margin-bottom: 1rem;
     }
     .nav-icon.teal  { background: var(--teal-50);  color: var(--teal-600); }
@@ -210,9 +212,11 @@
 
       <!-- Card 1: Busca de medicamentos -->
       <a href="consulta.html" class="nav-card teal">
-        <div class="nav-icon teal" aria-hidden="true"><i class="ti ti-pill"></i></div>
-        <p class="nav-title">Buscar medicamento</p>
-        <p class="nav-sub">Pesquise por nome, categoria ou via de administração e veja todos os detalhes.</p>
+        <div class="nav-header">
+          <div class="nav-icon teal" aria-hidden="true"><i class="ti ti-pill"></i></div>
+          <p class="nav-title">Buscar medicamento</p>
+        </div>
+        <p class="nav-sub">Pesquise por medicamentos e consulte sua bula.</p>
         <span class="nav-arrow">Acessar <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
       </a>
 
@@ -226,11 +230,11 @@
 
       <!-- Card 3: Fichas de pacientes -->
       <a href="pacientes.html" class="nav-card tuna">
-        <div class="nav-icon tuna" style="background: #EEF0FE; color: #534AB7;" aria-hidden="true">
+        <div class="nav-icon tuna" aria-hidden="true">
         <i class="ti ti-users"></i>
-</div>
+    </div>
         <p class="nav-title">Fichas de pacientes</p>
-        <p class="nav-sub">Crie e gerencie fichas com informações e lista de medicamentos de cada paciente.</p>
+        <p class="nav-sub">Crie e gerencie fichas para seus pacientes.</p>
         <span class="nav-arrow">
           Acessar <i class="ti ti-arrow-right" aria-hidden="true"></i>
         </span>

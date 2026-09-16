@@ -16,6 +16,8 @@
     "cors": "^2.8.6",
     "electron-squirrel-startup": "^1.0.1",
     "express": "^5.2.1",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.2.108",
     "sql.js": "^1.14.1"
   },
   "devDependencies": {
